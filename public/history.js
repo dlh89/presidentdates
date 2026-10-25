@@ -11,7 +11,7 @@ export function answer(date) {
     while (i > 0 && presidents[i][0] > date)
         i--;
     const current = presidents[i], transition = i > 0 && current[0] === date;
-    return { name: transition ? presidents[i - 1][1] + ' → ' + current[1] : current[1],
+    return { indices: transition ? [i-1,i] : [i], name: transition ? presidents[i - 1][1] + ' → ' + current[1] : current[1],
         detail: transition ? 'A handover day: ' + presidents[i - 1][1] + ' first, then ' + current[1] + '. Either name alone needs this qualification.' : current[1] + ' took office on ' + pretty(current[0]) + '.' };
 }
 const pick = (a, rng) => a[Math.floor(rng() * a.length)];

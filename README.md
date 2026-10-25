@@ -6,6 +6,7 @@ Plain HTML/CSS/JavaScript with a Node.js server and SQLite. No npm dependencies,
 
 - Username/password accounts with separate scores and learning histories.
 - Reveal, then mark right/wrong to advance.
+- Revealed answers show the presidential number, previous/next presidents and two short bio bullets with a source link. Handover dates show both presidents.
 - Roughly 50% ordinary years, 25% handover practice, 25% reviews of weak areas. Before any mistakes, the review share becomes handover practice.
 - Mistakes raise priority; successful reviews lower it. The latest 3,000 answers guide adaptation; all attempts count toward all-time totals.
 - Session score resets on reload/sign-in. All-time scores and login sessions survive server restarts.
@@ -156,7 +157,7 @@ This is a separate database. Accounts and progress from the earlier ChatGPT-host
 
 ## Checks and implementation
 
-Run `npm test`. Tests cover all handover boundaries, adaptive sampling, account isolation, persistence, duplicate-save handling, session expiry/logout, validation, CSRF/origin checks, secure cookie configuration, password hashing and login throttling.
+Run `npm test`. Tests cover all 47 presidential numbers, adjacent presidents, complete bio coverage, both sides of handovers, all handover boundaries, adaptive sampling, account isolation, persistence, duplicate-save handling, session expiry/logout, validation, CSRF/origin checks, secure cookie configuration, password hashing and login throttling.
 
 There are no third-party packages to install. server.js uses built-in HTTP, SQLite and crypto APIs; public/ contains the frontend and complete accession-date data. Server-specific deployment and HTTPS still need to be verified on your droplet.
 

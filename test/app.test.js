@@ -39,6 +39,7 @@ test('accounts, isolation, CSRF, validation, idempotency, sessions and persisten
  }
  try{
   assert.equal((await req('/api/progress')).status,401);
+  const bioAsset=await fetch(base+'/bios.js');assert.equal(bioAsset.status,200);assert.match(await bioAsset.text(),/revealedPresidents/);
   assert.equal((await req('/api/login',{username:'alice',password:'a'.repeat(12)},'','','https://evil.example')).status,403);
   assert.equal((await req('/api/register',{username:'alice',password:'short'})).status,400);
   const alice=await req('/api/register',{username:'Alice',password:'test-password-alice'});assert.equal(alice.status,201);assert.match(alice.headers.get('set-cookie'),/HttpOnly/);assert.match(alice.headers.get('set-cookie'),/SameSite=Lax/);
@@ -84,4 +85,25 @@ test('production config, secure cookies and throttling',async()=>{
   for(let i=0;i<32;i++)last=await call({username:'bad',password:'x'});
   assert.equal(last.status,429);assert(Number(last.headers.get('retry-after'))>0);
  }finally{await app.close();}
+});
+
+import {biographies,ordinal,revealedPresidents} from '../public/bios.js';
+test('revealed context covers all presidencies and both sides of handovers',()=>{
+ assert.equal(Object.keys(biographies).length,45);
+ for(let i=0;i<presidents.length;i++){
+  const date=iso(time(presidents[i][0])+86400000),cards=revealedPresidents(date);
+  assert.equal(cards.length,1);const card=cards[0];
+  assert.equal(card.number,i+1);assert.equal(card.name,presidents[i][1]);
+  assert.equal(card.previous?.name??null,presidents[i-1]?.[1]??null);
+  assert.equal(card.next?.name??null,presidents[i+1]?.[1]??null);
+  assert.equal(card.bullets.length,2);
+  for(const bullet of card.bullets)assert(bullet.length>0&&bullet.length<180);
+  assert(card.source.startsWith('https://'));
+  if(i>0)assert.deepEqual(revealedPresidents(presidents[i][0]).map(p=>p.number),[i,i+1]);
+ }
+ assert.equal(ordinal(1),'1st');assert.equal(ordinal(11),'11th');assert.equal(ordinal(12),'12th');assert.equal(ordinal(13),'13th');assert.equal(ordinal(21),'21st');assert.equal(ordinal(22),'22nd');assert.equal(ordinal(23),'23rd');
+ assert.equal(revealedPresidents('1888-01-01')[0].number,22);
+ assert.equal(revealedPresidents('1895-01-01')[0].number,24);
+ assert.equal(revealedPresidents('2019-01-01')[0].number,45);
+ assert.equal(revealedPresidents('2026-01-01')[0].number,47);
 });

@@ -105,7 +105,7 @@ export async function createApp(options={}){
     }
     return json({error:'Not found.'},404);
    }
-   const assets={'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/history.js':['history.js','text/javascript'],'/style.css':['style.css','text/css']};
+   const assets={'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/history.js':['history.js','text/javascript'],'/bios.js':['bios.js','text/javascript'],'/style.css':['style.css','text/css']};
    const asset=Object.hasOwn(assets,route)?assets[route]:null;
    if(!asset||!['GET','HEAD'].includes(req.method))return json({error:'Not found.'},404);
    const data=await readFile(path.join(publicDir,asset[0]));res.writeHead(200,{'Content-Type':asset[1]+'; charset=utf-8'});res.end(req.method==='HEAD'?undefined:data);

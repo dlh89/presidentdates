@@ -1,3 +1,4 @@
+import {revealedPresidents} from './bios.js';
 import {choose,answer,pretty} from './history.js';
 const $=id=>document.getElementById(id);
 let user=null,history=[],all={total:0,correct:0},session={total:0,correct:0},question=null,recent=[],revealed=false,busy=false,registration=false,signup=false,pending=null,retryAction=null;
@@ -15,7 +16,30 @@ function next(){
  recent=[...recent.slice(-11),question.date];revealed=false;pending=null;
  $('date').textContent=pretty(question.date);$('before').hidden=false;$('after').hidden=true;$('reveal').focus();
 }
-function reveal(){if(!question||busy||revealed)return;const result=answer(question.date);$('answer').textContent=result.name;$('explanation').textContent=result.detail;$('before').hidden=true;$('after').hidden=false;revealed=true;$('wrong').focus();}
+function renderPresidentDetails(date){
+ const entries=revealedPresidents(date),container=$('president-details');
+ container.replaceChildren();
+ for(const entry of entries){
+  const section=document.createElement('section');section.className='president-context';section.setAttribute('aria-label','About '+entry.name);
+  const title=document.createElement(entries.length>1?'h4':'p');title.className='president-number';
+  title.textContent=entries.length>1?entry.numberLabel+' · '+entry.name:entry.numberLabel;
+  section.append(title);
+  const neighbours=document.createElement('dl');neighbours.className='president-neighbours';
+  for(const [label,president,empty] of [['Previous',entry.previous,'None — first president'],['Next',entry.next,'None yet']]){
+   const group=document.createElement('div'),term=document.createElement('dt'),description=document.createElement('dd');
+   term.textContent=label;description.textContent=president?president.number+'. '+president.name:empty;
+   group.append(term,description);neighbours.append(group);
+  }
+  section.append(neighbours);
+  const list=document.createElement('ul');list.className='president-bio';
+  for(const bullet of entry.bullets){const item=document.createElement('li');item.textContent=bullet;list.append(item);}
+  section.append(list);
+  const source=document.createElement('a');source.className='bio-source';source.href=entry.source;source.target='_blank';source.rel='noreferrer';source.textContent='Biography source ↗';
+  section.append(source);container.append(section);
+ }
+}
+
+function reveal(){if(!question||busy||revealed)return;const result=answer(question.date);$('answer').textContent=result.name;$('explanation').textContent=result.detail;renderPresidentDetails(question.date);$('before').hidden=true;$('after').hidden=false;revealed=true;$('wrong').focus();}
 async function loadProgress(){
  setBusy(true);clearError();
  try{const data=await api('/api/progress');history=data.history;all=data.stats;session={total:0,correct:0};scores();$('saved').textContent='Progress saved to your account · '+user.username;next();}
