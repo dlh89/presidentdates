@@ -1,0 +1,25 @@
+[Unit]
+Description=Presidential date practice
+After=network.target
+
+[Service]
+Type=simple
+User=president-quiz
+Group=president-quiz
+WorkingDirectory=/opt/president-quiz
+EnvironmentFile=/etc/president-quiz.env
+ExecStart=/usr/bin/node /opt/president-quiz/server.js
+Restart=on-failure
+RestartSec=5
+UMask=0077
+StateDirectory=president-quiz
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/president-quiz
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

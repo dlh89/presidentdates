@@ -1,0 +1,5 @@
+# Replace quiz.example.com with your domain.
+# If Caddy already serves other sites, add this block to its existing config.
+quiz.example.com {
+    reverse_proxy 127.0.0.1:3000
+}
