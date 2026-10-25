@@ -104,6 +104,22 @@ sudo systemctl reload caddy
 
 Caddy obtains and renews HTTPS certificates when the domain and ports are configured correctly. Visit your HTTPS address and sign in. Do not serve production password login over plain HTTP.
 
+## Applying configuration changes
+
+When running under systemd, edit `/etc/president-quiz.env`; the supplied service does not read the repository's `.env`. After changing settings such as `APP_ORIGIN`, `DB_PATH`, or `ALLOW_REGISTRATION`, restart Node so it reads the new values:
+
+```sh
+sudo systemctl restart president-quiz
+sudo systemctl status president-quiz --no-pager -l
+curl http://127.0.0.1:3000/healthz
+```
+
+The health route should return `{"ok":true}`. If you changed `PORT`, use that port for the health check and update Apache or Caddy's proxy destination too.
+
+Changes to the environment file need a restart but no `daemon-reload`. If you edit the systemd service file itself, run `sudo systemctl daemon-reload` before restarting. Reload Apache or Caddy separately when changing its configuration.
+
+If running manually with `npm start`, edit the repository's `.env`, stop Node with Ctrl+C, and run `npm start` again.
+
 ## Accounts and password resets
 
 ```sh
